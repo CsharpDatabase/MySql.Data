@@ -6,13 +6,13 @@ EXTRA_DIST =
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = dmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- "-nowarn:108;628;162;219;414;618;168;169;612;114" -debug "-define:$(DefineConstants);DEBUG;TRACE"
-ASSEMBLY = bin/\$\(TargetFrameworkVersion\)/Debug/MySql.Data.dll
+ASSEMBLY = bin/Debug/MySql.Data.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
 PROJECT_REFERENCES = 
-BUILD_DIR = bin/$(TargetFrameworkVersion)/Debug/
+BUILD_DIR = bin/Debug
 
-MYSQL_DATA_DLL_MDB_SOURCE=bin/$(TargetFrameworkVersion)/Debug/MySql.Data.dll.mdb
+MYSQL_DATA_DLL_MDB_SOURCE=bin/Debug/MySql.Data.dll.mdb
 MYSQL_DATA_DLL_MDB=$(BUILD_DIR)/MySql.Data.dll.mdb
 
 endif
@@ -20,11 +20,11 @@ endif
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = dmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-nowarn:108;628;162;219;414;618;168;169;612;114" "-define:$(DefineConstants);TRACE"
-ASSEMBLY = bin/\$\(TargetFrameworkVersion\)/Release/MySql.Data.dll
+ASSEMBLY = bin/Release/MySql.Data.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES = 
-BUILD_DIR = bin/$(TargetFrameworkVersion)/Release/
+BUILD_DIR = bin/Release
 
 MYSQL_DATA_DLL_MDB=
 
@@ -165,8 +165,8 @@ FILES = \
 	zlib/ZOutputStream.cs \
 	zlib/ZStream.cs \
 	zlib/ZStreamException.cs \
-	Properties/Resources.Designer.cs \
-	Properties/AssemblyInfo.Schumix.cs 
+	Properties/AssemblyInfo.Schumix.cs \
+	Properties/Resources.Designer.cs 
 
 DATA_FILES = 
 
