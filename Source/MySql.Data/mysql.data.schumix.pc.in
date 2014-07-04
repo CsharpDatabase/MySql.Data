@@ -1,0 +1,6 @@
+Name: MySql.Data.Schumix
+Description: MySql.Data.Schumix
+Version: 0.1
+
+Requires: 
+Libs: -r:@expanded_libdir@/@PACKAGE@/MySql.Data.dll
