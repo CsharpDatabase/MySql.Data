@@ -114,7 +114,6 @@ FILES = \
 	PerformanceMonitor.cs \
 	PreparableStatement.cs \
 	ProcedureCache.cs \
-	Properties/AssemblyInfo.cs \
 	Properties/VersionInfo.cs \
 	Replication/ReplicationConfiguration.cs \
 	Replication/ReplicationManager.cs \
@@ -166,7 +165,8 @@ FILES = \
 	zlib/ZOutputStream.cs \
 	zlib/ZStream.cs \
 	zlib/ZStreamException.cs \
-	Properties/Resources.Designer.cs 
+	Properties/Resources.Designer.cs \
+	Properties/AssemblyInfo.Schumix.cs 
 
 DATA_FILES = 
 
