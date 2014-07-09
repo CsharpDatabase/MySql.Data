@@ -1,5 +1,4 @@
-MySql.Data
-==========
+#MySql.Data [![Build Status](https://travis-ci.org/CsharpDatabase/MySql.Data.png?branch=master)](https://travis-ci.org/CsharpDatabase/MySql.Data)
 
 This is a release of MySQL Connector/Net, Oracle's dual-
 license ADO.Net Driver for MySQL. For the avoidance of
