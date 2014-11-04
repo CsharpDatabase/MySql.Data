@@ -26,10 +26,17 @@ using System.Reflection;
 using System.Data;
 using System.Xml;
 using System.Data.Common;
-using System.Data.Metadata.Edm;
 using System.Diagnostics;
 using MySql.Data.Entity.Properties;
 using System.Globalization;
+#if EF6
+using System.Data.Entity.Core;
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Core.Metadata.Edm;
+#else
+using System.Data.Metadata.Edm;
+#endif
+
 
 namespace MySql.Data.MySqlClient
 {
@@ -233,10 +240,8 @@ namespace MySql.Data.MySqlClient
                 else if ((int)maxLengthFacet.Value > MEDIUMTEXT_MAXLEN) typeName = "longtext";
                 return TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType[typeName], isUnicode, isFixedLength, (int)maxLengthFacet.Value);
               }
-              else if (maxLengthFacet.Value != null && (maxLengthFacet.Value.ToString() == "Max"))
-                return TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["longtext"], isUnicode, isFixedLength);
               else
-                return TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType[typeName], isUnicode, isFixedLength);
+                return TypeUsage.CreateStringTypeUsage(StoreTypeNameToStorePrimitiveType["longtext"], isUnicode, isFixedLength, LONGBLOB_MAXLEN);
             }
           }
 
@@ -282,5 +287,12 @@ namespace MySql.Data.MySqlClient
       s.Close();
       return resourceAsString;
     }
+
+#if EF6
+    public override bool SupportsInExpression()
+    {
+      return true;
+    }
+#endif
   }
 }

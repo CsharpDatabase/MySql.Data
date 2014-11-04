@@ -26,9 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
-#if EF5
 using System.ComponentModel.DataAnnotations.Schema;
-#endif
 
 namespace MySql.Data.Entity.CodeFirst.Tests
 {

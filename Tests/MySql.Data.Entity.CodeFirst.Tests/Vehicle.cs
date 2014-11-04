@@ -26,15 +26,20 @@ using System.Linq;
 using System.Text;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+#if !EF6
 #if NET_45_OR_GREATER
 using System.Data.Spatial;
 #endif
-using System.ComponentModel.DataAnnotations.Schema;
+#endif
 
 
 
 namespace MySql.Data.Entity.CodeFirst.Tests
 {
+#if EF6
+  [DbConfigurationType(typeof(MySqlEFConfiguration))]
+#endif
   public class VehicleDbContext : DbContext
   {
     public DbSet<Vehicle> Vehicles { get; set; }
@@ -60,6 +65,9 @@ namespace MySql.Data.Entity.CodeFirst.Tests
   { 
   }
 
+#if EF6
+  [DbConfigurationType(typeof(MySqlEFConfiguration))]
+#endif
   public class VehicleDbContext2 : DbContext
   {
     public DbSet<Vehicle2> Vehicles { get; set; }
@@ -181,11 +189,14 @@ namespace MySql.Data.Entity.CodeFirst.Tests
 
     public DateTime DateTimeWithPrecision { get; set; }
 
-    [Column(TypeName = "timestamp")]
+    [Column(TypeName = "TimeStamp")]
     public DateTime TimeStampWithPrecision { get; set; }
 
   }
 
+#if EF6
+  [DbConfigurationType(typeof(MySqlEFConfiguration))]
+#endif
   public class ProductsDbContext : DbContext
   {
     public DbSet<Product> Products { get; set; }
@@ -225,6 +236,9 @@ namespace MySql.Data.Entity.CodeFirst.Tests
     }
   }
 
+#if EF6
+  [DbConfigurationType(typeof(MySqlEFConfiguration))]
+#endif
   public class AutoIncrementBugContext : DbContext
   {
     public DbSet<AutoIncrementBug> AutoIncrementBug { get; set; }

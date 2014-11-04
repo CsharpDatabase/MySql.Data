@@ -1,4 +1,4 @@
-﻿// Copyright © 2008, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright © 2008, 2013, Oracle and/or its affiliates. All rights reserved.
 //
 // MySQL Connector/NET is licensed under the terms of the GPLv2
 // <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most 
@@ -22,12 +22,18 @@
 
 using System.Text;
 using System.Collections.Generic;
-using System.Data.Common.CommandTrees;
-using System.Data.Metadata.Edm;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Diagnostics;
 using System;
+#if EF6
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
+#else
+using System.Data.Common.CommandTrees;
+using System.Data.Metadata.Edm;
+#endif
+
 
 namespace MySql.Data.Entity
 {
@@ -89,7 +95,7 @@ namespace MySql.Data.Entity
           PrimitiveTypeKind type = ((PrimitiveType)keyMember.TypeUsage.EdmType.BaseType).PrimitiveTypeKind;
           if ((type == PrimitiveTypeKind.Byte) || (type == PrimitiveTypeKind.SByte) ||
               (type == PrimitiveTypeKind.Int16) || (type == PrimitiveTypeKind.Int32) ||
-              (type == PrimitiveTypeKind.Int64) || (type == PrimitiveTypeKind.Decimal && IsValidMySqlDataType(keyMember.TypeUsage.EdmType.FullName)))
+              (type == PrimitiveTypeKind.Int64))
           {
             value = new LiteralFragment("last_insert_id()");
 	  }
@@ -101,11 +107,6 @@ namespace MySql.Data.Entity
       }
       select.Where = where;      
       return select;
-    }
-	
-	private bool IsValidMySqlDataType(string dataType)
-    {
-      return (new List<string>() { "MySql.ubigint" }).Contains(dataType);
     }
   }
 }

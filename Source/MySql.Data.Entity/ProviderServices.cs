@@ -22,9 +22,7 @@
 
 using System;
 using System.Data.Common;
-using System.Data.Common.CommandTrees;
 using System.Collections.Generic;
-using System.Data.Metadata.Edm;
 using System.Data;
 using MySql.Data.Entity;
 using System.Reflection;
@@ -33,11 +31,20 @@ using MySql.Data.Entity.Properties;
 using System.Text;
 using System.Linq;
 using System.Globalization;
+using MySql.Data.Common;
+#if EF6
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity.Core.Metadata.Edm;
+using System.Data.Entity.Spatial;
+using System.Data.Entity.Infrastructure;
+#else
+using System.Data.Common.CommandTrees;
+using System.Data.Metadata.Edm;
 #if NET_45_OR_GREATER
 using System.Data.Spatial;
 #endif
-using MySql.Data.Common;
-
+#endif
 
 namespace MySql.Data.MySqlClient
 {
@@ -63,7 +70,11 @@ namespace MySql.Data.MySqlClient
     }
   }
 
-  internal partial class MySqlProviderServices : DbProviderServices
+#if EF6
+  public sealed class MySqlProviderServices : DbProviderServices
+#else
+    internal partial class MySqlProviderServices : System.Data.Common.DbProviderServices
+#endif
   {
     internal static readonly MySqlProviderServices Instance;
     internal Version serverVersion { get; set; }
@@ -130,6 +141,14 @@ namespace MySql.Data.MySqlClient
         parameter.ParameterName = queryParameter.Key;
         parameter.Direction = ParameterDirection.Input;
         parameter.DbType = Metadata.GetDbType(queryParameter.Value);
+
+#if NET_45_OR_GREATER
+        if (queryParameter.Value.EdmType is PrimitiveType &&
+        ((PrimitiveType)queryParameter.Value.EdmType).PrimitiveTypeKind == PrimitiveTypeKind.Geometry)
+        {
+          ((MySqlParameter)parameter).MySqlDbType = MySqlDbType.Geometry;
+        }
+#endif
 
         FunctionParameter funcParam;
         if (function != null &&
@@ -360,7 +379,7 @@ namespace MySql.Data.MySqlClient
       {
         EntityType childType = (EntityType)a.ReferentialConstraints[0].ToProperties[0].DeclaringType;
         EntityType parentType = (EntityType)a.ReferentialConstraints[0].FromProperties[0].DeclaringType;
-		string fkName = a.Name;
+    string fkName = a.Name;
         if (fkName.Length > 64)
         {
           fkName = "FK_" + Guid.NewGuid().ToString().Replace("-", "");
@@ -430,7 +449,7 @@ namespace MySql.Data.MySqlClient
       foreach (EdmProperty c in e.Properties)
       {
         sql.AppendFormat("{0}{1}\t`{2}` {3}{4}", delimiter, Environment.NewLine, c.Name,
-            GetColumnType(c.TypeUsage), GetFacetString(c));
+            GetColumnType(c.TypeUsage), GetFacetString(c, e.KeyMembers.Contains(c.Name)));
         delimiter = ", ";
       }
       sql.AppendLine(");");
@@ -485,7 +504,7 @@ namespace MySql.Data.MySqlClient
       return t;
     }
 
-    private string GetFacetString(EdmProperty column)
+    private string GetFacetString(EdmProperty column, bool IsKeyMember)
     {
       StringBuilder sql = new StringBuilder();
       Facet facet;
@@ -499,7 +518,9 @@ namespace MySql.Data.MySqlClient
         if (!column.TypeUsage.EdmType.Name.EndsWith("text", StringComparison.OrdinalIgnoreCase))
         {
           if (facets.TryGetValue("MaxLength", true, out facet))
-            sql.AppendFormat(" ({0})", facet.Value);
+          {
+              sql.AppendFormat(" ({0})", facet.Value);
+          }
         }
       }
       else if (column.TypeUsage.EdmType.BaseType.Name == "Decimal")

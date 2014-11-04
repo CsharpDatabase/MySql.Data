@@ -24,10 +24,17 @@ using System;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using MySql.Data.MySqlClient.Tests;
+#if !EF6
 using System.Data.EntityClient;
-using System.Data.Common;
 using System.Data.Objects;
 using System.Data.Entity.Design;
+#else
+using System.Data.Entity.Core.Common;
+using System.Data.Entity.Core.EntityClient;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.ModelConfiguration.Design;
+#endif
+using System.Data.Common;
 using System.Linq;
 using Store;
 using System.Configuration;
@@ -48,6 +55,7 @@ namespace MySql.Data.Entity.Tests
       st = data;
     }
 
+#if !EF6
     private EntityConnection GetConnection()
     {
       return EntityStoreSchemaGenerator.CreateStoreSchemaConnection(
@@ -71,7 +79,8 @@ namespace MySql.Data.Entity.Tests
             Assert.Equal(dt.Rows[i++]["TABLE_NAME"], t.GetString(2));
         }
       }
-    }
+    } 
+
 
     [Fact]
     public void SelectAllViews()
@@ -92,6 +101,7 @@ namespace MySql.Data.Entity.Tests
         }
       }
     }
+#endif
 
     [Fact]
     public void GetDbProviderManifestTokenReturnsCorrectSchemaVersion()
@@ -117,7 +127,11 @@ namespace MySql.Data.Entity.Tests
       if (st.Version < new Version(5, 0)) return;
 
       MySqlProviderManifest manifest = new MySqlProviderManifest(st.Version.Major + "." + st.Version.Minor);
+#if !EF6
       using (XmlReader reader = manifest.GetInformation(DbProviderManifest.StoreSchemaDefinition))
+#else
+      using (XmlReader reader = manifest.GetInformation(DbXmlEnabledProviderManifest.StoreSchemaDefinition))
+#endif
       {
         Assert.NotNull(reader);
       }

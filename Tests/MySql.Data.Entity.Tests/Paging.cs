@@ -1,4 +1,4 @@
-// Copyright © 2014 Oracle and/or its affiliates. All rights reserved.
+// Copyright © 2013 Oracle and/or its affiliates. All rights reserved.
 //
 // MySQL Connector/NET is licensed under the terms of the GPLv2
 // <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most 
@@ -26,9 +26,14 @@ using System.Threading;
 using MySql.Data.MySqlClient;
 using MySql.Data.MySqlClient.Tests;
 using System.Linq;
+#if !EF6
 using System.Data.EntityClient;
+using System.Data.Objects; 
+#else
+using System.Data.Entity.Core.EntityClient;
+using System.Data.Entity.Core.Objects;
+#endif
 using System.Data.Common;
-using System.Data.Objects;
 using MySql.Data.Entity.Tests.Properties;
 using Xunit;
 
@@ -138,42 +143,6 @@ namespace MySql.Data.Entity.Tests
       {
         int cnt = context.Companies.Take(2).Count();
         Assert.Equal(2, cnt);
-      }
-    }
-
-    /// <summary>
-    /// Fix for EF SQL Generator, Union Syntax (Concat operator) is missing required parentheses 
-    /// (may cause semantic changes when combined with Limit clause (Take operator)). 
-    /// (MySql bug #70828, Oracle bug #18049691).
-    /// </summary>
-    [Fact]
-    public void TakeWithUnion()
-    {
-      int[] ids = new int[] { 1, 2, 3, 4 };
-      string[] names = new string[] { "Slinky", "Rubiks Cube", "Lincoln Logs", "Legos" };
-      using (testEntities ctx = new testEntities())
-      {
-        var q = ctx.Toys;
-        var q2 = ctx.Toys.Take(0).Concat(q);
-        var q3 = q.Concat(q.Take(0));
-        int i = 0;
-        string sql = q2.ToTraceString();
-        st.CheckSql(sql, SQLSyntax.UnionWithLimit2);
-        foreach (var row in q2)
-        {
-          Assert.Equal<int>(ids[i], row.Id);
-          Assert.Equal<string>(names[i], row.Name);
-          i++; 
-        }
-        i = 0;
-        sql = q3.ToTraceString();
-        st.CheckSql(sql, SQLSyntax.UnionWithLimit);
-        foreach (var row in q)
-        {
-          Assert.Equal<int>(ids[i], row.Id);
-          Assert.Equal<string>( names[ i ], row.Name );
-          i++; 
-        }
       }
     }
   }
